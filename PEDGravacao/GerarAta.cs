@@ -18,6 +18,8 @@ namespace PEDGravacao
 {
     public partial class GerarAta : Form
     {
+        String tt;
+
         public GerarAta()
         {
             InitializeComponent();
@@ -108,11 +110,11 @@ namespace PEDGravacao
         {
             if(audioList.SelectedItem != null)
             {
-                    var audio = audioList.SelectedItem;
-                    audio = Path.GetFileName(audio.ToString());
+                var audio = audioList.SelectedItem;
+                audio = Path.GetFileName(audio.ToString());
 
-                    object txt = StreamingRecognizeAsync(@"C:\PEDGRAVACAO\Audios\" + audio.ToString());
-                    contAta.Text = txt.ToString();
+                var txt = StreamingRecognizeAsync(@"C:\PEDGRAVACAO\Audios\" + audio.ToString());
+                contAta.Text = txt.ToString();
 
             }
             else
@@ -124,9 +126,11 @@ namespace PEDGravacao
 
         static async Task<object> StreamingRecognizeAsync(string filePath)
         {
+            
             var speech = SpeechClient.Create();
             var streamingCall = speech.StreamingRecognize();
-            String texto;
+            String saidWhat, lastSaidWhat = null, txt;
+            txt = null;
             // Write the initial request with the config.
             await streamingCall.WriteAsync(
                 new StreamingRecognizeRequest()
@@ -154,7 +158,16 @@ namespace PEDGravacao
                     {
                         foreach (var alternative in result.Alternatives)
                         {
-                            texto = alternative.Transcript;
+                            saidWhat = alternative.Transcript;
+                            if (lastSaidWhat != saidWhat)
+                            {
+                                Console.WriteLine(saidWhat);
+                                lastSaidWhat = saidWhat;
+                                //PegaTexto(saidWhat);
+                                txt += saidWhat;
+                                //Need to call this on UI thread ....
+                                //textBox1.Invoke((MethodInvoker)delegate { textBox1.AppendText(textBox1.Text + saidWhat + " \r\n"); });
+                            }
                         }
                     }
                 }
@@ -179,7 +192,13 @@ namespace PEDGravacao
             }
             await streamingCall.WriteCompleteAsync();
             await printResponses;
-            return 0;
+            return txt;
+        }
+
+        private static string PegaTexto(String texto) 
+        {
+            //tt = texto;
+            return texto.ToString();
         }
     }
 }

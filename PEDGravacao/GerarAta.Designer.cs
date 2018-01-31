@@ -62,7 +62,6 @@
             // contAta
             // 
             this.contAta.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.contAta.Enabled = false;
             this.contAta.Location = new System.Drawing.Point(6, 31);
             this.contAta.Name = "contAta";
             this.contAta.Size = new System.Drawing.Size(432, 199);
