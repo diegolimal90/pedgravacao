@@ -30,7 +30,7 @@
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(GerarAta));
             this.btnCriaDoc = new System.Windows.Forms.Button();
-            this.textBox1 = new System.Windows.Forms.TextBox();
+            this.tituloDoc = new System.Windows.Forms.TextBox();
             this.contAta = new System.Windows.Forms.RichTextBox();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
@@ -52,18 +52,21 @@
             this.btnCriaDoc.UseVisualStyleBackColor = true;
             this.btnCriaDoc.Click += new System.EventHandler(this.button1_Click);
             // 
-            // textBox1
+            // tituloDoc
             // 
-            this.textBox1.Location = new System.Drawing.Point(6, 29);
-            this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(432, 20);
-            this.textBox1.TabIndex = 3;
+            this.tituloDoc.Location = new System.Drawing.Point(6, 29);
+            this.tituloDoc.Name = "tituloDoc";
+            this.tituloDoc.Size = new System.Drawing.Size(432, 20);
+            this.tituloDoc.TabIndex = 3;
             // 
             // contAta
             // 
             this.contAta.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.contAta.Cursor = System.Windows.Forms.Cursors.Default;
+            this.contAta.EnableAutoDragDrop = true;
             this.contAta.Location = new System.Drawing.Point(6, 31);
             this.contAta.Name = "contAta";
+            this.contAta.ReadOnly = true;
             this.contAta.Size = new System.Drawing.Size(432, 199);
             this.contAta.TabIndex = 4;
             this.contAta.Text = "";
@@ -71,7 +74,7 @@
             // 
             // groupBox1
             // 
-            this.groupBox1.Controls.Add(this.textBox1);
+            this.groupBox1.Controls.Add(this.tituloDoc);
             this.groupBox1.Location = new System.Drawing.Point(12, 12);
             this.groupBox1.Name = "groupBox1";
             this.groupBox1.Size = new System.Drawing.Size(444, 64);
@@ -144,7 +147,7 @@
         #endregion
 
         private System.Windows.Forms.Button btnCriaDoc;
-        private System.Windows.Forms.TextBox textBox1;
+        private System.Windows.Forms.TextBox tituloDoc;
         private System.Windows.Forms.RichTextBox contAta;
         private System.Windows.Forms.GroupBox groupBox1;
         private System.Windows.Forms.GroupBox groupBox2;

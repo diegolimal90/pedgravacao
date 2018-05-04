@@ -66,6 +66,7 @@
             this.WaveAudioLevel.Location = new System.Drawing.Point(14, 19);
             this.WaveAudioLevel.Name = "WaveAudioLevel";
             this.WaveAudioLevel.Size = new System.Drawing.Size(385, 42);
+            this.WaveAudioLevel.Style = System.Windows.Forms.ProgressBarStyle.Continuous;
             this.WaveAudioLevel.TabIndex = 16;
             // 
             // timerHora

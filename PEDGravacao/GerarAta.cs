@@ -18,7 +18,6 @@ namespace PEDGravacao
 {
     public partial class GerarAta : Form
     {
-        String tt;
 
         public GerarAta()
         {
@@ -28,51 +27,59 @@ namespace PEDGravacao
         private void GerarAta_Load(object sender, EventArgs e)
         {
             listar();
-
-
+            contAta.Text = "Selecione o arquivo e Clique em Gerar Texto";
+            btnCriaDoc.Enabled = false;
         }
 
         private void button1_Click(object sender, EventArgs e)
         {
-            object oMissing = System.Reflection.Missing.Value;
-            object oEndOfDoc = "\\endofdoc"; /* \endofdoc is a predefined bookmark */
+            String conteudo, titulo;
+            conteudo = contAta.Text;
+            titulo = tituloDoc.Text;
+            if( tituloDoc.Text != "" && contAta.Text != "")
+            {
 
-            //Start Word and create a new document.
-            Word._Application oWord;
-            Word._Document oDoc;
-            oWord = new Word.Application();
-            oWord.Visible = true;
-            oDoc = oWord.Documents.Add(ref oMissing, ref oMissing,
-            ref oMissing, ref oMissing);
+                object oMissing = System.Reflection.Missing.Value;
+                object oEndOfDoc = "\\endofdoc"; /* \endofdoc is a predefined bookmark */
 
-            //Insert a paragraph at the beginning of the document.
-            Word.Paragraph oPara1;
-            oPara1 = oDoc.Content.Paragraphs.Add(ref oMissing);
-            oPara1.Range.Text = "Heading 1";
-            oPara1.Range.Font.Bold = 1;
-            oPara1.Format.SpaceAfter = 24;    //24 pt spacing after paragraph.
-            oPara1.Range.InsertParagraphAfter();
+                //Start Word and create a new document.
+                Word._Application oWord;
+                Word._Document oDoc;
+                oWord = new Word.Application();
+                oWord.Visible = true;
+                oDoc = oWord.Documents.Add(ref oMissing, ref oMissing,
+                ref oMissing, ref oMissing);
 
-            //Insert a paragraph at the end of the document.
-            Word.Paragraph oPara2;
-            object oRng = oDoc.Bookmarks.get_Item(ref oEndOfDoc).Range;
-            oPara2 = oDoc.Content.Paragraphs.Add(ref oRng);
-            oPara2.Range.Text = "Heading 2";
-            oPara2.Format.SpaceAfter = 6;
-            oPara2.Range.InsertParagraphAfter();
+                //Insert a paragraph at the beginning of the document.
+                Word.Paragraph oPara1;
+                oPara1 = oDoc.Content.Paragraphs.Add(ref oMissing);
+                oPara1.Range.Text = titulo;
+                oPara1.Range.Font.Bold = 1;
+                oPara1.Format.SpaceAfter = 24;    //24 pt spacing after paragraph.
+                oPara1.Range.InsertParagraphAfter();
 
-            //Insert another paragraph.
-            Word.Paragraph oPara3;
-            oRng = oDoc.Bookmarks.get_Item(ref oEndOfDoc).Range;
-            oPara3 = oDoc.Content.Paragraphs.Add(ref oRng);
-            oPara3.Range.Text = "This is a sentence of normal text. Now here is a table:";
-            oPara3.Range.Font.Bold = 0;
-            oPara3.Format.SpaceAfter = 24;
-            oPara3.Range.InsertParagraphAfter();
+                //Insert a paragraph at the end of the document.
+                object oRng = oDoc.Bookmarks.get_Item(ref oEndOfDoc).Range;
+                
+                //Insert another paragraph.
+                Word.Paragraph oPara3;
+                oRng = oDoc.Bookmarks.get_Item(ref oEndOfDoc).Range;
+                oPara3 = oDoc.Content.Paragraphs.Add(ref oRng);
+                oPara3.Range.Text = conteudo;
+                oPara3.Range.Font.Bold = 0;
+                oPara3.Format.SpaceAfter = 24;
+                oPara3.Range.InsertParagraphAfter();
 
-            oWord.Application.ActiveDocument.SaveAs2(@"C:\Test\teste.docx");
-            //Close this form.
-            //this.Close();
+                oWord.Application.ActiveDocument.SaveAs2(@"C:\PEDGRAVACAO\Documentos\" + titulo + ".docx");
+                //Close this form.
+                //this.Close();
+
+            }
+            else
+            {
+                MessageBox.Show("Por favor, Coloque um titulo e gere o texto para o documento!");
+            }
+            
         }
 
         private void GerarAta_FormClosed(object sender, FormClosedEventArgs e)
@@ -114,8 +121,7 @@ namespace PEDGravacao
                 audio = Path.GetFileName(audio.ToString());
 
                 var txt = StreamingRecognizeAsync(@"C:\PEDGRAVACAO\Audios\" + audio.ToString());
-                contAta.Text = txt.ToString();
-
+                contAta.Text = "Gerando texto aguarde!";
             }
             else
             {
@@ -124,12 +130,12 @@ namespace PEDGravacao
             
         }
 
-        static async Task<object> StreamingRecognizeAsync(string filePath)
+        async Task<string> StreamingRecognizeAsync(string filePath)
         {
             
             var speech = SpeechClient.Create();
             var streamingCall = speech.StreamingRecognize();
-            String saidWhat, lastSaidWhat = null, txt;
+            String texto, ultimoTexto = "", txt;
             txt = null;
             // Write the initial request with the config.
             await streamingCall.WriteAsync(
@@ -158,19 +164,22 @@ namespace PEDGravacao
                     {
                         foreach (var alternative in result.Alternatives)
                         {
-                            saidWhat = alternative.Transcript;
-                            if (lastSaidWhat != saidWhat)
+                            texto = alternative.Transcript;
+                            if (ultimoTexto != texto)
                             {
-                                Console.WriteLine(saidWhat);
-                                lastSaidWhat = saidWhat;
-                                //PegaTexto(saidWhat);
-                                txt += saidWhat;
-                                //Need to call this on UI thread ....
-                                //textBox1.Invoke((MethodInvoker)delegate { textBox1.AppendText(textBox1.Text + saidWhat + " \r\n"); });
+                                ultimoTexto = texto;
+                                txt = txt + ultimoTexto + " ";
+                                Console.WriteLine(texto);
+                                
                             }
                         }
                     }
                 }
+                contAta.Invoke((MethodInvoker)delegate { contAta.Clear(); });
+                //Need to call this on UI thread ....
+                contAta.Invoke((MethodInvoker)delegate { contAta.AppendText(txt); });
+                btnCriaDoc.Invoke((MethodInvoker)delegate { btnCriaDoc.Enabled = true; });
+                brnGeraTexto.Invoke((MethodInvoker)delegate { brnGeraTexto.Enabled = false; });
             });
             // Stream the file content to the API.  Write 2 32kb chunks per
             // second.
@@ -191,14 +200,11 @@ namespace PEDGravacao
                 };
             }
             await streamingCall.WriteCompleteAsync();
-            await printResponses;
+            //return printResponses;
             return txt;
+
+            
         }
 
-        private static string PegaTexto(String texto) 
-        {
-            //tt = texto;
-            return texto.ToString();
-        }
     }
 }
